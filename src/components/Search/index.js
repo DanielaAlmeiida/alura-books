@@ -1,7 +1,8 @@
 import Input from '../Input'
 import styled from 'styled-components'
-import { useState } from 'react'
-import { books } from './searchData'
+import { useEffect, useState } from 'react'
+import { getBooks } from '../../services/books'
+import { postFavorite } from '../../services/favorites'
 
 const SearchContainer = styled.section`
     color: #FFF;
@@ -17,6 +18,7 @@ const Title = styled.h2`
     text-align: center;
     width: 100%;
 `
+
 const Subtitle = styled.h3`
     font-size: 16px;
     font-weight: 500;
@@ -43,6 +45,21 @@ const Results = styled.div`
 export default function Search() {
 
     const [searchedBooks, setSearchedBooks] = useState([])
+    const [ books, setBooks ] = useState([])
+
+    useEffect(() => {
+        fetchBooks()
+    }, [])
+
+    async function fetchBooks() {
+        const APIBooks = await getBooks()
+        setBooks(APIBooks)
+    }
+
+    async function insertFavorite(id) {
+        await postFavorite(id)
+        alert(`Book with id: ${id} inserted!`)
+    }
 
     return (
         <SearchContainer>
@@ -58,7 +75,7 @@ export default function Search() {
             />
     
         { searchedBooks.map( book => (
-            <Results>
+            <Results onClick={ () => insertFavorite(book.id) }>
                 <p>  { book.name } </p> 
                 <img src= { book.src } />
             </Results>
